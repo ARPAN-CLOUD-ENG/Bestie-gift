@@ -825,7 +825,7 @@
   // NEON SKETCH GENERATOR SCRIPT LOGIC
   // ==========================================================
   // 👉 CHANGE HERE: apni image ka filename/path likhein (music file jaise usi folder me rakhein)
-  const NEON_IMAGE_SRC = "IMG_20260731_101350_964.jpg";
+  const NEON_IMAGE_SRC = "your-image.jpg";
 
   const sketchCanvas = document.getElementById('sketchCanvas');
   const sCtx = sketchCanvas.getContext('2d', { willReadFrequently: true });
@@ -852,12 +852,23 @@
 
   function scaleAndSetupNeonCanvas() {
     const wrapper = document.querySelector('.canvas-wrapper');
-    const maxW = wrapper ? wrapper.clientWidth : 800;
-    const maxH = window.innerHeight * 0.75;
-    const ratio = Math.min(maxW / uploadedImage.width, maxH / uploadedImage.height);
+    const maxW = (wrapper && wrapper.clientWidth > 0) ? wrapper.clientWidth : 800;
+    const maxH = (window.innerHeight > 0) ? window.innerHeight * 0.75 : 600;
 
-    sketchCanvas.width = Math.floor(uploadedImage.width * ratio);
-    sketchCanvas.height = Math.floor(uploadedImage.height * ratio);
+    const imgW = uploadedImage.naturalWidth || uploadedImage.width;
+    const imgH = uploadedImage.naturalHeight || uploadedImage.height;
+
+    if (!imgW || !imgH) {
+      console.error('Neon sketch: image dimensions invalid', imgW, imgH);
+      sketchCanvas.width = 800;
+      sketchCanvas.height = 600;
+      return;
+    }
+
+    const ratio = Math.min(maxW / imgW, maxH / imgH);
+
+    sketchCanvas.width = Math.max(1, Math.floor(imgW * ratio));
+    sketchCanvas.height = Math.max(1, Math.floor(imgH * ratio));
   }
 
   // Sirf fade-in transition ke liye — generate is se trigger nahi hota
@@ -882,6 +893,8 @@
     hasGenerated = true;
     revealBtn.disabled = true;
     if (neonAnimationId) cancelAnimationFrame(neonAnimationId);
+    scaleAndSetupNeonCanvas();
+    sCtx.drawImage(uploadedImage, 0, 0, sketchCanvas.width, sketchCanvas.height);
     neonLoading.textContent = "Analyzing edges... please wait.";
     neonLoading.style.display = 'block';
 
