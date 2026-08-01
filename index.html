@@ -850,13 +850,7 @@
   };
   uploadedImage.src = NEON_IMAGE_SRC;
 
-  function scaleAndSetupNeonCanvas() {
-    const wrapper = document.querySelector('.canvas-wrapper');
-    const maxW = (wrapper && wrapper.clientWidth > 0) ? wrapper.clientWidth : 800;
-    const maxH = (window.innerHeight > 0) ? window.innerHeight * 0.75 : 600;
-
-    const imgW = uploadedImage.naturalWidth || uploadedImage.width;
-    const imgH = uploadedImage.naturalHeight || uploadedImage.height;
+//jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
 
     if (!imgW || !imgH) {
       console.error('Neon sketch: image dimensions invalid', imgW, imgH);
