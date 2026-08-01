@@ -518,7 +518,7 @@
   <button class="close-reveal" id="closeReveal">Lock Page 🔒</button>
   <button class="audio-toggle" id="audioToggle">🎵 Ambient Music: OFF</button>
   
-  <audio id="bgMusic" loop  src="k.mp3"></audio>
+  <audio id="bgMusic" loop crossorigin="anonymous" src="k.mp3"></audio>
 
   <div class="nebula"></div>
 
@@ -825,14 +825,16 @@
   // NEON SKETCH GENERATOR SCRIPT LOGIC
   // ==========================================================
   // 👉 CHANGE HERE: apni image ka filename/path likhein (music file jaise usi folder me rakhein)
-  const NEON_IMAGE_SRC = "IMG_20260731_101350_964.jpg";
+  const NEON_IMAGE_SRC = "your-image.jpg";
 
   const sketchCanvas = document.getElementById('sketchCanvas');
   const sCtx = sketchCanvas.getContext('2d', { willReadFrequently: true });
   const neonLoading = document.getElementById('neonLoading');
   const neonSection = document.getElementById('neonSection');
+  const revealBtn = document.getElementById('revealBtn');
 
   let uploadedImage = new Image();
+  uploadedImage.crossOrigin = "anonymous"; // GitHub Pages jaise hosted images ke liye zaroori
   let neonAnimationId;
   let isImageLoaded = false;
   let hasGenerated = false;
@@ -841,6 +843,10 @@
     isImageLoaded = true;
     scaleAndSetupNeonCanvas();
     sCtx.drawImage(uploadedImage, 0, 0, sketchCanvas.width, sketchCanvas.height);
+  };
+  uploadedImage.onerror = function() {
+    neonLoading.textContent = `Image load nahi ho payi: "${NEON_IMAGE_SRC}". Filename/path check karein (case-sensitive hota hai).`;
+    neonLoading.style.display = 'block';
   };
   uploadedImage.src = NEON_IMAGE_SRC;
 
@@ -853,8 +859,6 @@
     sketchCanvas.width = Math.floor(uploadedImage.width * ratio);
     sketchCanvas.height = Math.floor(uploadedImage.height * ratio);
   }
-
-  const revealBtn = document.getElementById('revealBtn');
 
   // Sirf fade-in transition ke liye — generate is se trigger nahi hota
   const neonObserver = new IntersectionObserver((entries) => {
@@ -887,7 +891,7 @@
         neonLoading.style.display = 'none';
       } catch (err) {
         console.error('Neon sketch error:', err);
-        neonLoading.textContent = "Yeh feature file ko seedha double-click karke kholne par kaam nahi karta. Page ko local server se kholein (jaise VS Code ka 'Live Server' extension) — tab address bar me file:// ki jagah http://127.0.0.1 dikhega.";
+        neonLoading.textContent = "Sketch generate nahi ho paya (" + err.name + "). Browser console (F12) me poora error dekhein.";
         revealBtn.disabled = false;
         hasGenerated = false;
       }
@@ -954,19 +958,25 @@
     function draw() {
       if (currentIndex >= particles.length) return;
 
-      sCtx.shadowColor = '#ffb84d';
       sCtx.shadowBlur = 5;
 
       for (let i = 0; i < speed && currentIndex < particles.length; i++) {
         const p = particles[currentIndex];
         sCtx.globalAlpha = p.a;
 
-        if (p.mix < 0.4) {
+        // Girlish pink-yellow-purple dust mix
+        if (p.mix < 0.35) {
           sCtx.fillStyle = '#ff8fc7';   // soft pink
-        } else if (p.mix < 0.75) {
+          sCtx.shadowColor = '#ff8fc7';
+        } else if (p.mix < 0.6) {
           sCtx.fillStyle = '#ffd670';   // warm gold-yellow
+          sCtx.shadowColor = '#ffd670';
+        } else if (p.mix < 0.85) {
+          sCtx.fillStyle = '#c084fc';   // soft lavender-purple
+          sCtx.shadowColor = '#c084fc';
         } else {
           sCtx.fillStyle = '#ff5da2';   // deep candy pink
+          sCtx.shadowColor = '#ff5da2';
         }
 
         sCtx.fillRect(p.x, p.y, 1.5, 1.5);
